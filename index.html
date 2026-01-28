@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>十五古文高效學習站 - 專業演示版</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #e67e22;
+            --text-bg: #fdfaf4;
+            --white: #ffffff;
+        }
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: #f0f2f5; margin: 0; display: flex; height: 100vh; color: #333; }
+        
+        /* 側邊導覽 */
+        nav { width: 280px; background: var(--primary-color); color: white; overflow-y: auto; display: flex; flex-direction: column; flex-shrink: 0; }
+        nav h2 { text-align: center; padding: 25px 10px; margin: 0; background: #1a252f; font-size: 1.2rem; letter-spacing: 2px; }
+        nav ul { list-style: none; padding: 0; margin: 0; }
+        nav li { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid #3e4f5f; transition: 0.3s; font-size: 1rem; }
+        nav li:hover { background: var(--secondary-color); padding-left: 35px; }
+        nav li.active { background: var(--accent-color); border-left: 6px solid white; font-weight: bold; }
+
+        /* 主顯示區 */
+        main { flex: 1; overflow-y: auto; padding: 40px; scroll-behavior: smooth; }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        /* 文章區塊控制 */
+        .article-section { display: none; background: var(--white); padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); animation: fadeIn 0.5s; }
+        .article-section.active { display: block; }
+
+        h1 { color: var(--primary-color); margin-top: 0; border-bottom: 3px solid var(--accent-color); padding-bottom: 15px; font-size: 2rem; }
+        .subtitle { color: #7f8c8d; margin-bottom: 35px; font-style: italic; }
+
+        /* Tabs 樣式 */
+        .tabs { display: flex; border-bottom: 2px solid #eee; margin-bottom: 30px; gap: 10px; }
+        .tab { padding: 12px 30px; cursor: pointer; background: #f8f9fa; border-radius: 10px 10px 0 0; transition: 0.3s; font-weight: bold; color: #666; border: 1px solid #eee; border-bottom: none; }
+        .tab:hover { background: #eee; }
+        .tab.active { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+        
+        .tab-content { display: none; line-height: 1.8; }
+        .tab-content.active { display: block; animation: slideUp 0.4s; }
+
+        /* 內容元件：譯文區塊 */
+        .translation-block { margin-bottom: 25px; padding: 20px; border-radius: 10px; background: var(--text-bg); border-left: 5px solid #d4a373; transition: 0.3s; }
+        .translation-block:hover { transform: translateX(5px); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .original { font-weight: bold; font-size: 1.2rem; color: #2c3e50; margin-bottom: 10px; }
+        .translation { color: #5d6d7e; font-size: 1.05rem; }
+
+        /* 內容元件：閃卡 */
+        .flashcard-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 20px; }
+        .flashcard { height: 160px; perspective: 1000px; cursor: pointer; }
+        .flashcard-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flashcard.flipped .flashcard-inner { transform: rotateY(180deg); }
+        .front, .back { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; border-radius: 15px; padding: 20px; box-sizing: border-box; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .front { background: white; color: var(--primary-color); border: 2px solid #eee; font-weight: bold; font-size: 1.1rem; }
+        .back { background: var(--accent-color); color: white; transform: rotateY(180deg); font-size: 1.05rem; }
+
+        /* 動畫 */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { opacity: 1; } }
+
+    </style>
+</head>
+<body>
+
+<nav>
+    <h2>古文十五選目</h2>
+    <ul id="nav-list">
+        <li class="active" onclick="changeArticle(1)">01 燭之武退秦師</li>
+        <li onclick="changeArticle(2)">02 諫逐客書</li>
+        <li onclick="changeArticle(3)">03 鴻門宴</li>
+        <li onclick="changeArticle(4)">04 出師表</li>
+        <li onclick="changeArticle(5)">05 桃花源記</li>
+        <li onclick="changeArticle(6)">06 師說</li>
+        <li onclick="changeArticle(7)">07 赤壁賦</li>
+        <li onclick="changeArticle(8)">08 項脊軒志</li>
+        <li onclick="changeArticle(9)">09 晚遊六橋待月記</li>
+        <li onclick="changeArticle(10)">10 虯髯客傳</li>
+        <li onclick="changeArticle(11)">11 勞山道士</li>
+        <li onclick="changeArticle(12)">12 大同與小康</li>
+        <li onclick="changeArticle(13)">13 勸和論</li>
+        <li onclick="changeArticle(14)">14 鹿港乘桴記</li>
+        <li onclick="changeArticle(15)">15 畫菊自序</li>
+    </ul>
+</nav>
+
+<main>
+    <div class="container" id="content-container">
+
+<section id="article-1" class="article-section active">
+    <h1>01 燭之武退秦師</h1>
+    <p class="subtitle">《左傳．僖公三十年》—— 春秋時期最精彩的外交辭令</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (12)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">考點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">晉侯、秦伯圍鄭，以其無禮於晉，且貳於楚也。晉軍函陵，秦軍氾南。</div>
+            <div class="translation">晉文公、秦穆公聯合圍攻鄭國，因為鄭國曾對晉文公無禮（流亡過鄭時），且在晉楚城濮之戰中，鄭國對晉有二心而親附楚國。此時晉軍駐紮在函陵，秦軍駐紮在氾水之南。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">佚之狐言於鄭伯曰：「國危矣，若使燭之武見秦君，師必退。」公從之。</div>
+            <div class="translation">大夫佚之狐對鄭文公說：「國家危急了，如果派燭之武去見秦君，秦國軍隊一定會撤退。」鄭文公聽從了他的建議。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">辭曰：「臣之壯也，猶不如人；今老矣，無能為也已。」</div>
+            <div class="translation">燭之武推辭說：「我壯年時，尚且不如別人；現在老了，無能為力了。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">公曰：「吾不能早用子，今急而求子，是寡人之過也。然鄭亡，子亦有不利焉。」許之。</div>
+            <div class="translation">鄭文公說：「我沒能早點重用您，現在危急才來求您，這是我的過錯。然而鄭國滅亡，對您也是不利的啊。」燭之武這才答應了。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">夜縋而出。見秦伯曰：「秦、晉圍鄭，鄭既知亡矣。若亡鄭而有益於君，敢以煩執事。」</div>
+            <div class="translation">他在夜晚用繩子綁著身體吊下城牆出城。見到秦穆公後說：「秦、晉兩國圍攻鄭國，鄭國已經知道自己要滅亡了。如果滅掉鄭國對您有幫助，那儘管麻煩您的部下。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「越國以鄙遠，君知其難也。焉用亡鄭以陪鄰？鄰之厚，君之薄也。」</div>
+            <div class="translation">「但是越過他國（晉）而以遠方的鄭國作為邊境，您知道那是很困難的。何必滅掉鄭國來增加鄰國（晉）的土地呢？鄰國實力雄厚，相對地您的實力就削弱了。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「若舍鄭以為東道主，行李之往來，共其乏困，君亦無所害。」</div>
+            <div class="translation">「如果放棄滅鄭，讓鄭國作為您東方道路上的主人，貴國使節往來時，鄭國可以供給缺乏的物資，對您也沒壞處。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「且君嘗為晉君恩矣，許君焦、瑕，朝濟而夕設版焉，君之所知也。夫晉，何厭之有？」</div>
+            <div class="translation">「況且您曾對晉惠公有恩，他答應給您焦、瑕二地，結果他早上剛過河回國，晚上就設屏障防禦您，這是您知道的。晉國哪有滿足的時候？」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「既東封鄭，又欲肆其西封，若不闕秦，將焉取之？闕秦以利晉，唯君圖之。」</div>
+            <div class="translation">「既然它在東邊以鄭國為國界，之後勢必又想擴張西邊的國界。如果不損害秦國，它要從哪奪取土地？損害秦國來利於晉國，請您深思這件事。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">秦伯說，與鄭人盟。使杞子、逢孫、楊孫戍之，乃還。</div>
+            <div class="translation">秦穆公很高興，與鄭國訂立盟約。派杞子、逢孫、楊孫駐守鄭國，自己便撤軍回國。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">子犯請擊之。公曰：「不可。微夫人之力不及此。因人之力而敝之，不仁；失其所與，不知；以亂易整，不武。吾其還也。」亦去之。</div>
+            <div class="translation">晉大夫子犯請求攻擊秦軍。晉文公說：「不行。如果沒有那個人（秦穆公）的力量，我不會有今天。憑藉人家的力量反過來損害人家，是不仁義；失去盟友，是不明智；用混亂取代整齊的陣容，是不勇武。我們還是回去吧。」於是晉軍也撤離了。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「且貳於楚」</div><div class="back">有二心（同時事奉兩國）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「晉軍函陵」的「軍」</div><div class="back">動詞：駐紮</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「是」寡人之過也</div><div class="back">這（指示代名詞）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">夜「縋」而出</div><div class="back">音ㄓㄨㄟˋ，繫繩懸吊</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「鄙」遠</div><div class="back">以...為邊境（名詞作動詞）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「陪」鄰</div><div class="back">增加、益</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「行李」之往來</div><div class="back">外交使節</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「共」其乏困</div><div class="back">音ㄍㄨㄥ，供給（通「供」）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">何「厭」之有</div><div class="back">滿足（通「饜」）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「闕」秦以利晉</div><div class="back">侵損、削減</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「微」夫人之力</div><div class="back">無、如果沒有</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">左傳的「體例」？</div><div class="back">編年體（春秋三傳之一）</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>外交說詞的邏輯 (談判藝術)</h3>
+        <ul>
+            <li><strong>Step 1 欲擒故縱：</strong>「鄭既知亡矣」——先承認滅亡的事實，消除對方的戒心。</li>
+            <li><strong>Step 2 利害分析：</strong>「亡鄭以陪鄰」——指出滅鄭只會讓鄰居（晉）變強，對秦無益。</li>
+            <li><strong>Step 3 誘之以利：</strong>「舍鄭以為東道主」——保留鄭國可以作為秦國的外交補給站。</li>
+            <li><strong>Step 4 挑撥離間：</strong>引用「焦、瑕」往事，拆穿晉國背信忘義的真面目。</li>
+        </ul>
+        <hr>
+        <h3>重要成語溯源</h3>
+        <ol>
+            <li><strong>東道主：</strong>原指鄭國在秦國東邊，現指招待賓客的主人。</li>
+            <li><strong>行李：</strong>原指外交使者，現指旅行攜帶的衣物。</li>
+            <li><strong>貪得無厭：</strong>由「夫晉，何厭之有」延伸而來。</li>
+        </ol>
+    </div>
+</section>
+
+<section id="article-2" class="article-section">
+    <h1>02 諫逐客書</h1>
+    <p class="subtitle">李斯 —— 秦代散文之祖，駢散結合的政治說服經典</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (12)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">考點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">臣聞吏議逐客，竊以為過矣。</div>
+            <div class="translation">臣聽說官吏們正在商議要驅逐客卿，我私下認為這是錯誤的。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">昔穆公求士，西取由余於戎，東得百里奚於宛，迎蹇叔於宋，來丕豹、公孫支於晉。此五子者，不產於秦，而穆公用之，並國二十，遂霸西戎。</div>
+            <div class="translation">從前秦穆公尋求賢才，向西從西戎取得了由余，向東從宛地得到百里奚，從宋國迎來蹇叔，從晉國招來丕豹和公孫支。這五個人都不出生在秦國，但穆公任用他們，兼併了二十個國家，於是稱霸於西戎。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">孝公用商鞅之法，移風易俗，民以殷盛，國以富強，百姓樂用，諸侯親服，獲楚、魏之師，舉地千里，至今治強。</div>
+            <div class="translation">秦孝公任用商鞅實施變法，改變了社會風氣與習俗，人民因此殷實富裕，國家因此富強。百姓樂於為國效力，諸侯紛紛親附順服；擊敗了楚、魏的軍隊，擴張領土千里，直到現在秦國仍治理得很好且國力強大。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">今陛下致昆山之玉，有隨、和之寶，垂明月之珠，服太阿之劍，乘纖離之馬，建翠鳳之旗，樹靈鼉之鼓。此數寶者，秦不生一焉，而陛下說之，何也？</div>
+            <div class="translation">現在陛下獲得了崑崙山的玉石，擁有隨侯珠、和氏璧，垂掛著明月珠，佩帶著太阿劍，騎著纖離名馬，樹立著翠鳳旗，架設著靈鼉皮製成的鼓。這幾樣寶物，秦國連一項都不產，但陛下卻很喜愛它們，這是為什麼呢？</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">必秦國之所生然後可，則是夜光之璧，不飾朝廷；犀象之器，不為玩好；鄭、衛之女，不充後宮；而駿良駃騠，不實外廄。</div>
+            <div class="translation">如果一定要秦國產的東西才可以使用，那麼夜光璧就不會裝飾在朝廷上，犀角與象牙製品就不會成為玩賞之物，鄭、衛兩國的美女就不會充滿後宮，駿馬駃騠也不會填滿外面的馬廄。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">夫擊甕叩缶、彈箏搏髀，而歌呼嗚嗚快耳者，真秦之聲也。《鄭》、《衛》、《桑間》、《昭》、《虞》、《武》、《象》者，異國之樂也。今棄擊甕叩缶而就《鄭》、《衛》，退彈箏而取《昭》、《虞》，若是者何也？快意當前，適觀而已矣。</div>
+            <div class="translation">敲擊瓦甕陶罐、彈響秦箏、拍打大腿，嗚嗚地吼叫歌唱來取悅耳朵的，才是真正的秦國音樂。而《鄭》、《衛》等地的音樂，則是異國的音樂。現在您放棄敲瓦甕去聽鄭衛之聲，屏除秦箏而聽《昭》、《虞》，為什麼要這樣呢？不過是因為能讓當下心情愉快，適合感官欣賞罷了。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">是以太山不讓土壤，故能成其大；河海不擇細流，故能就其深；王者不卻眾庶，故能明其德。</div>
+            <div class="translation">因此，泰山不捨棄任何土壤，所以能成就它的高大；河海不分辨任何細流，所以能成就它的深廣；君王不拒絕任何百姓，所以能彰顯他的盛德。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">今逐客以資敵國，損民以益讎，內自虛而外樹怨於諸侯，求國無危，不可得也。</div>
+            <div class="translation">現在驅逐客卿來資助敵國，減損自己人民來增加仇敵實力，內部使自己空虛，外面又跟諸侯結怨，這樣想要國家沒有危險，是不可能的。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「竊」以為過</div><div class="back">私下（謙詞）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「遂」霸西戎</div><div class="back">於是、就</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「致」昆山之玉</div><div class="back">獲得、招引</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">陛下「說」之</div><div class="back">音ㄩㄝˋ，喜愛（通「悅」）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">擊甕叩「缶」</div><div class="back">音ㄈㄡˇ，瓦罐、陶製品</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">彈箏搏「髀」</div><div class="back">音ㄅㄧˋ，大腿</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「適」觀而已</div><div class="back">適合、滿足</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">不「讓」土壤</div><div class="back">拒絕、辭讓</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">不「卻」眾庶</div><div class="back">拒絕、推卻</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">以「資」敵國</div><div class="back">資助、供給</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「藉」寇兵</div><div class="back">借給（借武器給敵人）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「賫」盜糧</div><div class="back">音ㄐㄧ，贈送、給予</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>論證結構：四層遞進</h3>
+        
+        <ol>
+            <li><strong>歷史史實（由古證今）：</strong>列舉秦國歷史上四位明君任用外才而強盛的實績。</li>
+            <li><strong>生活器物（由物證人）：</strong>以秦王喜愛外國珍寶、音樂、美女為例，反諷「重物輕人」的荒謬。</li>
+            <li><strong>自然比喻（由理證道）：</strong>以泰山、河海為喻，強調君王應有廣納天下的心胸。</li>
+            <li><strong>利害衝突（總結危害）：</strong>指出逐客將導致「資敵益讎」，造成秦國的自我毀滅。</li>
+        </ol>
+        <hr>
+        <h3>文學地位：駢文之祖</h3>
+        <ul>
+            <li><strong>風格：</strong>運用大量排比句、對偶句，氣勢奔放且具備說服力。</li>
+            <li><strong>名句：</strong>「太山不讓土壤，故能成其大；河海不擇細流，故能就其深。」</li>
+        </ul>
+    </div>
+</section>
+
+<section id="article-3" class="article-section">
+    <h1>03 鴻門宴</h1>
+    <p class="subtitle">司馬遷 —— 《史記》中張力最強、人物性格對比最鮮明的篇章</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (15)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">人物與考點</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">沛公軍霸上，未得與項羽相見。劉邦左司馬曹無傷使人言於項羽曰：「沛公欲王關中，使子嬰為相，珍寶盡有之。」</div>
+            <div class="translation">劉邦駐軍在霸上，還沒跟項羽見面。劉邦的左司馬曹無傷派人告訴項羽說：「劉邦想在關中稱王，讓秦王字嬰當宰相，佔有秦國所有的珍寶。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">項羽大怒曰：「旦日饗士卒，為擊破沛公軍！」當是時，項羽兵四十萬，在新豐鴻門；沛公兵十萬，在霸上。范增說項羽曰：「沛公居山東時，貪於財貨，好美姬。今入關，財物無所取，婦女無所幸，此其志不在小。吾令人望其氣，皆為龍虎，成五采，此天子氣也。急擊勿失！」</div>
+            <div class="translation">項羽大怒說：「明天早晨犒勞士兵，給我擊破劉邦的軍隊！」當時，項羽軍隊四十萬，駐在鴻門；劉邦軍隊十萬，駐在霸上。范增勸項羽說：「劉邦以前在關東時，貪圖錢財，愛好美女。現在進關，財物一點不取，婦女一個不親近，這說明他的志向不小。我派人觀察他的氣色，都呈龍虎狀，像五彩雲霞，這是天子之氣。趕快攻擊，不要錯失良機！」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">楚左尹項伯者，項羽季父也，素善留侯張良。項伯乃夜馳之沛公軍，私見張良，具告以事，欲呼張良與俱去，曰：「毋從俱死也。」</div>
+            <div class="translation">楚國左尹項伯，是項羽的叔父，平時跟張良交情很好。項伯於是連夜騎馬趕到劉邦軍營，私下會見張良，把事情詳細告訴他，想叫張良跟他一起離開，說：「不要跟著劉邦一起送死。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">沛公曰：「君安與項伯有故？」張良曰：「秦時與臣遊，臣殺人，項伯活我。今事有急，故幸來告良。」沛公曰：「孰與君少長？」良曰：「長於臣。」沛公曰：「君為我呼入，吾得兄事之。」</div>
+            <div class="translation">劉邦問：「你怎麼跟項伯有舊交？」張良說：「秦朝時他跟我交往，我殺了人，項伯救過我。現在事態緊急，幸虧他來告知。」劉邦問：「他跟你比誰大？」張良說：「他比我大。」劉邦說：「你替我請他進來，我要像對待兄長一樣侍奉他。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">沛公旦日從百餘騎來見項王，至鴻門，謝曰：「臣與將軍戮力而攻秦，將軍戰河北，臣戰河南，不自意能先入關破秦，得復見將軍於此。今者有小人之言，說有將軍，令將軍與臣有郤。」</div>
+            <div class="translation">劉邦隔天早晨帶領一百多人騎馬來見項羽，到了鴻門，謝罪說：「我與將軍合力攻秦，將軍在黃河以北作戰，我在黃河以南作戰，沒想到我能先入關擊破秦軍，能在這裡再次見到將軍。現在有小人造謠，中傷我們的關係，才讓將軍跟我產生了嫌隙。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">項王曰：「此沛公左司馬曹無傷言之。不然，籍何以至此？」項王即日因留沛公與飲。</div>
+            <div class="translation">項羽說：「這是你的左司馬曹無傷說的，否則，我項籍怎麼會氣到這種程度？」項羽當天就留下劉邦一起喝酒。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">范增數目項王，舉所佩玉玦以示之者三，項王默然不應。范增起，出召項莊，謂曰：「君王為人不忍。若入前為壽，壽畢，請以舞劍，因擊沛公於坐，殺之。」</div>
+            <div class="translation">范增多次向項羽使眼色，三次舉起佩帶的玉玦示意項羽，項羽默不作聲沒有反應。范增起身出去召見項莊，對他說：「君王為人狠不下心。你進去上前敬酒，敬完酒，請准許舞劍，趁機在座位上刺殺劉邦。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">項莊拔劍起舞，項伯亦拔劍起舞，常以身翼蔽沛公，莊不得擊。</div>
+            <div class="translation">項莊拔劍起舞，項伯也拔劍起舞，常常用身體像翅膀一樣掩護劉邦，使項莊無法刺殺。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">噲遂入，披帷西向立，瞋目視項王，頭髮上指，目眥盡裂。項王曰：「壯士！賜之卮酒。」</div>
+            <div class="translation">樊噲於是闖入，揭開帷幕面朝西站立，瞪著眼看項羽，頭髮向上直豎，眼角都要裂開了。項羽說：「壯士！賞他一杯酒。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">樊噲曰：「臣死且不避，卮酒安足辭！夫秦王有虎狼之心，殺人如不能舉，刑人如恐不勝，天下皆叛之。懷王與諸將約曰：『先破秦入咸陽者王之。』今沛公先破秦入咸陽，毫毛不敢有所近，封府庫，休舍霸上，以待大王來。勞苦而功高如此，未有封侯之賞，而聽細說，欲誅有功之人。此亡秦之續耳，竊為大王不取也！」</div>
+            <div class="translation">樊噲說：「我死都不怕，一杯酒有什麼好推辭的！秦王有虎狼般狠毒的心腸，殺人唯恐殺不盡，嚴刑處分唯恐用不完，天下人都背叛他。懷王曾與諸將約定：『先破秦入咸陽的就封王。』現在劉邦先破秦入咸陽，一點東西都不敢取，封閉倉庫，駐軍霸上，就是為了等待大王。這樣勞苦功高，沒得到封侯的賞賜，您反而聽信小人之言，想殺害有功之人。這簡直是走秦朝滅亡的老路，我私下認為大王不該採取這種做法！」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">沛公已出，項王使都尉陳平召沛公。沛公曰：「今者出，未辭也，為之奈何？」樊噲曰：「大行不顧細謹，大禮不辭小讓。如今人方為刀俎，我為魚肉，何辭為！」</div>
+            <div class="translation">劉邦已經出去，項羽派都尉陳平召呼劉邦。劉邦問：「現在出來了，沒告辭，怎麼辦？」樊噲說：「做大事不必顧慮小節，行大禮不必計較小的辭讓。現在人家就像菜刀和砧板，我們就像魚和肉，還告辭什麼！」</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「饗」士卒</div><div class="back">犒賞、用酒食款待</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「說」項羽曰</div><div class="back">音ㄕㄨㄟˋ，勸說</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「距」關，毋內諸侯</div><div class="back">距通「拒」；內通「納」</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「孰與」君少長</div><div class="back">與...相比，哪一個較...</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「兄」事之</div><div class="back">名詞作副詞：以兄長之禮（對待）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「謝」曰</div><div class="back">謝罪、道歉</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">有「郤」</div><div class="back">音ㄒㄧˋ，隔閡、嫌隙</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「數目」項王</div><div class="back">多次用眼色示意</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「玦」的含義</div><div class="back">音ㄐㄩㄝˊ，半環形佩玉（喻決斷）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">為人「不忍」</div><div class="back">狠不下心</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「翼」蔽沛公</div><div class="back">名詞作副詞：像翅膀一樣</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">目「眥」盡裂</div><div class="back">音ㄗˋ，眼眶</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「刑」人</div><div class="back">名詞作動詞：處以刑罰</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「刀俎」</div><div class="back">俎音ㄗㄨˇ，砧板</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「史記」體例？</div><div class="back">紀傳體（通史之祖）</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>人物性格對比</h3>
+        <table border="1" style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr style="background:#eee;"><th>人物</th><th>性格特點</th></tr>
+            <tr><td><strong>項羽</strong></td><td>優柔寡斷、自大、重義氣、不善用人。</td></tr>
+            <tr><td><strong>劉邦</strong></td><td>卑躬屈膝、圓滑狡詐、能屈能伸、善於聽諫。</td></tr>
+            <tr><td><strong>范增</strong></td><td>眼光敏銳、老謀深算（亞父）。</td></tr>
+            <tr><td><strong>張良</strong></td><td>沉著冷靜、足智多謀。</td></tr>
+        </table>
+        <hr>
+        <h3>成語精選</h3>
+        <ul>
+            <li><strong>項莊舞劍，意在沛公：</strong>比喻說話或行動表面上有個名目，私下裡卻別有用心。</li>
+            <li><strong>勞苦功高：</strong>辛苦工作，功勞很大。</li>
+            <li><strong>人為刀俎，我為魚肉：</strong>比喻生殺大權掌握在別人手裡，自己處於被宰割的地位。</li>
+            <li><strong>秋毫無犯：</strong>形容軍隊紀律嚴明，完全不侵擾百姓。</li>
+        </ul>
+    </div>
+</section>
+
+<section id="article-4" class="article-section">
+    <h1>04 出師表</h1>
+    <p class="subtitle">諸葛亮 —— 老臣丹心的告白，「讀出師表不墮淚者其人必不忠」</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (15)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">考點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">先帝創業未半，而中道崩殂。今天下三分，益州疲弊，此誠危急存亡之秋也。</div>
+            <div class="translation">先帝（劉備）創立大業還沒完成一半，就中途去世了。現在天下分裂成三國，我們蜀漢國力困乏，這實在是情勢危急、決定生存或滅亡的關鍵時刻。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">然侍衛之臣，不懈於內；忠志之士，忘身於外者，蓋追先帝之殊遇，欲報之於陛下也。誠宜開張聖聽，以光先帝遺德，恢弘志士之氣；不宜妄自菲薄，引喻失義，以塞忠諫之路也。</div>
+            <div class="translation">然而宮中侍衛官在朝廷內毫不懈怠，忠誠志士在邊防捨命奮鬥，是因為懷念先帝生前的特殊厚遇，想報答在陛下您的身上。您實在應該廣泛聽取群臣意見，來發揚先帝留下的美德，振奮志士們的意氣；不應該隨便看輕自己，說出不合情理的話，而堵塞了忠臣進諫的管道。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">宮中府中，俱為一體，陟罰臧否，不宜異同。若有作姦犯科，及為忠善者，宜付有司，論其刑賞，以昭陛下平明之治；不宜偏私，使內外異法也。</div>
+            <div class="translation">皇宮中與丞相府中的人，都是一個整體。對於官員的提升、懲罰與評價，標準應該一致。如果有違法犯紀或盡忠行善的人，應該交給專責部門，判定該有的處分或獎賞，來顯示陛下公平明正的治理；不應該存有偏私，使朝廷內外法規不一。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">侍中、侍郎郭攸之、費褘、董允等，此皆良實，志慮忠純，是以先帝簡拔以遺陛下。愚以為宮中之事，事無大小，悉以咨之，然後施行，必能裨補闕漏，有所廣益。</div>
+            <div class="translation">郭攸之、費褘、董允等人，都是善良誠實的人，志向和思慮都很忠誠純正，所以先帝選拔出來留給陛下。我認為宮中的事情，無論大小，都應徵詢他們的意見後再執行，這樣一定能補救缺點遺漏，獲得更多益處。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">親賢臣，遠小人，此先漢所以興隆也；親小人，遠賢臣，此後漢所以傾頹也。先帝在時，每與臣論此事，未嘗不歎息痛恨於桓、靈也。</div>
+            <div class="translation">親近賢臣、疏遠小人，這是西漢之所以興盛的原因；親近小人、疏遠賢臣，這是東漢之所以衰敗的原因。先帝在世時，每次跟我談論這件事，對桓公、靈公兩帝的昏庸沒有一次不感到嘆息與痛心的。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">臣本布衣，躬耕於南陽，苟全性命於亂世，不求聞達於諸侯。先帝不以臣卑鄙，猥自枉屈，三顧臣於草廬之中，諮臣以當世之事，由是感激，遂許先帝以驅馳。</div>
+            <div class="translation">我原本是個平民，在南陽親自耕田，只想在亂世中保全性命，不求在諸侯間出名。先帝不嫌棄我身分卑微、見識淺陋，降低身分屈就自己，三次到草廬中來看我，諮詢我對當代時勢的看法。我因此感激，於是答應為先帝奔走效勞。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">後值傾覆，受任於敗軍之際，奉命於危難之間，爾來二十有一年矣。先帝知臣謹慎，故臨崩寄臣以大事也。受命以來，夙夜憂歎，恐託付不效，以傷先帝之明。</div>
+            <div class="translation">後來遇到失敗，我在軍隊潰敗時承擔重任，在危急時刻奉命求援，至今已經二十一年了。先帝知道我做事謹慎，所以臨終前把國家大事託付給我。受命以來，我日夜憂慮嘆息，擔心託付的任務沒有成效，損害了先帝知人之明。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">今南方已定，兵甲已足，當獎率三軍，北定中原，庶竭駑鈍，攘除奸凶，興復漢室，還於舊都。此臣所以報先帝，而忠陛下之職分也。</div>
+            <div class="translation">現在南方已經平定，兵器盔甲也已充足，應當激勵率領三軍北上平定中原。我希望竭盡平庸的才力，剷除奸詐兇惡的曹魏，復興漢朝王室，遷回舊京洛陽。這是我用來報答先帝並效忠陛下的本分。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">崩「殂」</div><div class="back">音ㄘㄨˊ，死亡（指帝王）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">危急存亡之「秋」</div><div class="back">關鍵時刻</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「陟」罰臧否</div><div class="back">音ㄓˋ，提升、進用</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">陟罰「臧否」</div><div class="back">臧（ㄗㄤ）善；否（ㄆㄧˇ）惡</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「裨」補闕漏</div><div class="back">音ㄅㄧˋ，補救、幫助</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「痛恨」於桓靈</div><div class="back">痛心、遺憾（古今異義）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">臣本「布衣」</div><div class="back">平民</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">不以臣「卑鄙」</div><div class="back">出身卑微，見識淺陋（非指人品）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「猥」自枉屈</div><div class="back">音ㄨㄟˇ，降低身分（謙詞）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「夙夜」憂歎</div><div class="back">早晚，指整天、日夜</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">庶竭「駑鈍」</div><div class="back">資質平庸（謙稱自己的才力）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「攘除」奸凶</div><div class="back">剷除、排除</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">諮「諏」善道</div><div class="back">音ㄗㄡ，詢問</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">臨表「涕」泣</div><div class="back">眼淚</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">本文的「表」？</div><div class="back">臣子寫給帝王的奏章</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>三項核心建議</h3>
+        <ol>
+            <li><strong>廣開言路：</strong>「開張聖聽」，告誡後主不可妄自菲薄。</li>
+            <li><strong>嚴明賞罰：</strong>「宮中府中，俱為一體」，不可偏私。</li>
+            <li><strong>親賢遠佞：</strong>此為全篇關鍵，舉出東漢衰敗即因親近小人。</li>
+        </ol>
+        <hr>
+        <h3>寫作特色</h3>
+        <ul>
+            <li><strong>語氣：</strong>雖然是臣子對帝王的「表」，但語氣更像「長輩對晚輩」的叮嚀，叮囑中帶有深情。</li>
+            <li><strong>結構：</strong>前段多論理（勸諫），後段多敘事（報恩感懷）。</li>
+            <li><strong>地位：</strong>與李密《陳情表》、韓愈《祭十二郎文》並稱為「三大抒情文」。</li>
+        </ul>
+        <hr>
+        <h3>歷史背景</h3>
+        <p>寫於諸葛亮準備出兵北伐前夕。當時蜀漢在三國中實力最弱，且先帝劉備剛去世幾年，政權尚不穩定，故諸葛亮憂心忡忡，百般叮嚀。</p>
+    </div>
+</section>
+
+<section id="article-5" class="article-section">
+    <h1>05 桃花源記</h1>
+    <p class="subtitle">陶淵明 —— 追尋心中最純淨的烏托邦，虛實交錯的隱逸經典</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (12)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">重點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">晉太元中，武陵人捕魚為業。緣溪行，忘路之遠近。忽逢桃花林，夾岸數百步，中無雜樹，芳草鮮美，落英繽紛。漁人甚異之，復前行，欲窮其林。</div>
+            <div class="translation">東晉太元年間，有一個武陵人以捕魚為生。有一天他順著溪水划船，忘記了路程的遠近。忽然遇到一片桃花林，生長在溪流兩岸長達數百步，中間沒有別的雜樹，芳草鮮嫩美麗，落花紛紛。漁人對此感到非常驚奇，繼續向前划，想走到林子的盡頭。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">林盡水源，便得一山，山有小口，彷彿若有光。便捨船，從口入。初極狹，才通人。復行數十步，豁然開朗。</div>
+            <div class="translation">桃林的盡頭是溪水的源頭，在那裡發現一座山，山上有個小洞口，洞裡隱隱約約像是有光亮。漁人就丟下船，從小洞口進去。剛開始洞口非常狹窄，僅容一個人通過。再往前走幾十步，眼前頓時變得開闊明亮。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">土地平曠，屋舍儼然，有良田、美池、桑竹之屬。阡陌交通，雞犬相聞。其中往來種作，男女衣著，悉如外人。黃髮垂髫，並怡然自樂。</div>
+            <div class="translation">這裡土地平坦開闊，房屋排列整齊，還有肥沃的田地、美麗的池塘，以及桑樹、竹林之類。田間小路交錯通達，雞鳴狗叫聲處處可聞。在那裡來往幹活的人，男女的衣著打扮完全像外面的人。老人和小孩都顯得心滿意足，快樂自得。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">見漁人，乃大驚，問所從來。具答之。便要還家，設酒殺雞作食。村中聞有此人，咸來問訊。</div>
+            <div class="translation">桃源人看見漁人，感到非常驚訝，問他是從哪裡來的。漁人詳細地回答了他們。桃源人就邀請漁人到家裡去，準備酒菜、殺雞作飯款待他。村子裡的人聽說來了這麼一個人，都跑來打聽消息。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">自雲先世避秦時亂，率妻子邑人來此絕境，不復出焉，遂與外人隔絕。問今是何世，乃不知有漢，無論魏晉。</div>
+            <div class="translation">他們自己說祖先為了躲避秦朝時的戰亂，帶領妻子兒女及同鄉人來到這處與世隔絕的地方，不再出去，於是就跟外面的人斷絕了往來。他們問現在是什麼朝代，竟然不知道有過漢朝，更不必說魏朝和晉朝了。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">此人一一為具言所聞，皆嘆惋。餘人各復延至其家，皆出酒食。停數日，辭去。此中人語云：「不足為外人道也。」</div>
+            <div class="translation">漁人把自己所知道的消息詳細地告訴了他們，聽的人都感嘆惋惜。其餘的人又各自邀請漁人到自己家裡，都拿出酒飯招待。住了幾天，漁人向他們辭行。臨走前，這裡的人告訴他：「這裡的情況不值得對外面的人說啊。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">既出，得其船，便扶向路，處處誌之。及郡下，詣太守，說如此。太守即遣人隨其往，尋向所誌，遂迷，不復得路。南陽劉子驥，高尚士也，聞之，欣然規往。未果，尋病終，後遂無問津者。</div>
+            <div class="translation">漁人出來後，找到了他的船，就順著舊路回去，處處都做了標記。到了郡城，去拜見太守，報告了這番經歷。太守立即派人跟著他去，尋找先前所做的標記，結果竟然迷了路，再也找不到那條路了。南陽人劉子驥是個高尚的士人，聽說這件事，也興致勃勃地計畫前往。但沒有實現，不久就病逝了。此後就再也沒有探尋桃花源的人了。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「緣」溪行</div><div class="back">沿著、順著</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「落英」繽紛</div><div class="back">落花</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">甚「異」之</div><div class="back">形容詞作動詞：感到驚奇</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">屋舍「儼然」</div><div class="back">整齊的樣子</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「阡陌」交通</div><div class="back">田間小路。南北為阡，東西為陌</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「黃髮」垂髫</div><div class="back">借代：老人（長壽者頭髮由白轉黃）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">黃髮「垂髫」</div><div class="back">借代：小孩（頭髮下垂尚未紮起）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「便要」還家</div><div class="back">要通「邀」：邀請</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">來此「絕境」</div><div class="back">與世隔絕的地方（古今異義）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「無論」魏晉</div><div class="back">更不必說（古今異義）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">處處「誌」之</div><div class="back">動詞：做標記</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「無問津者」</div><div class="back">問津：詢問渡口（引申為探訪、尋求）</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>理想世界的特徵</h3>
+        <ul>
+            <li><strong>環境：</strong>和諧、寧靜、自給自足（良田、美池、桑竹）。</li>
+            <li><strong>社會：</strong>沒有戰亂、沒有剝削、人人平等且快樂自得。</li>
+            <li><strong>人情：</strong>純樸好客（設酒殺雞作食）。</li>
+        </ul>
+        <hr>
+        <h3>寫作技巧：虛實結合</h3>
+        <p>陶淵明巧妙地將「真實存在」的地理位置（武陵、南陽）與「幻想」的世外桃源結合，增加故事的真實感，最後卻以「不復得路」與「無問津者」收尾，暗示這種理想社會在現實中難以求得。</p>
+        <hr>
+        <h3>陶淵明的「隱逸」思想</h3>
+        <p>本文為《桃花源詩》的序言。陶淵明不願隨波逐流，透過這篇文章寄託他對現實社會的不滿，以及對和平勞動生活的嚮往。</p>
+    </div>
+</section>
+
+<section id="article-6" class="article-section">
+    <h1>06 師說</h1>
+    <p class="subtitle">韓愈 —— 捍衛道統的勇者，重申「從師學習」的必要性</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (15)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">考點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">古之學者必有師。師者，所以傳道、受業、解惑也。人非生而知之者，孰能無惑？惑而不從師，其為惑也，終不解矣。</div>
+            <div class="translation">古代求學的人一定有老師。老師，是用來傳授道理、講解學業、解答疑難問題的人。人不是一生下來就懂得道理的，誰能沒有疑難問題呢？有了疑難而不向老師學習，那些問題就永遠不能解決了。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">生乎吾前，其聞道也，固先乎吾，吾從而師之；生乎吾後，其聞道也，亦先乎吾，吾從而師之。吾師道也，夫庸知其年之先後生於吾乎？是故無貴無賤，無長無少，道之所存，師之所存也。</div>
+            <div class="translation">出生在我之前的人，他懂得道理本來就比我早，我應該向他學習；出生在我之後的人，如果他懂得道理也比我早，我也應該向他學習。我學習的是道理，哪裡需要去管他的年齡比我大還是比我小呢？因此，無論地位高低、無論年齡大小，道理存在的地方，就是老師所在的地方。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">嗟乎！師道之不傳也久矣！欲人之無惑也難矣！古之聖人，其出人也遠矣，猶且從師而問焉；今之眾人，其下聖人也亦遠矣，而恥學於師。是故聖益聖，愚益愚。</div>
+            <div class="translation">唉！從師學習的風尚不流傳已經很久了！想要人們沒有疑難問題也就難了！古代的聖人，他們超出一般人很多，尚且跟從老師請教；現在的一般人，他們低於聖人也很遠，卻以向老師學習為恥。因此，聖人更加聖明，愚人更加愚昧。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">愛其子，擇師而教之；於其身也，則恥師焉，惑矣。彼童子之師，授之書而習其句讀者，非吾所謂傳其道解其惑者也。句讀之不知，惑之不解，或師焉，或不焉，小學而大遺，吾未見其明也。</div>
+            <div class="translation">人們愛護孩子，會選擇老師來教導他們；但對於自己，卻以從師學習為恥，真是糊塗啊！那些小孩子的老師，只是教孩子讀書、練習斷句的人，並不是我所說的傳授道理、解答疑難的人。不懂斷句去請教老師，有了大疑問卻不請教老師，小的方面要學習，大的方面卻遺棄了，我看不出這種人是聰明的。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">聖人無常師。孔子師郯子、萇弘、師襄、老聃。郯子之徒，其賢不及孔子。孔子曰：「三人行，則必有我師。」</div>
+            <div class="translation">聖人沒有固定的老師。孔子曾向郯子、萇弘、師襄、老聃請教。郯子這些人，他們的賢能雖然比不上孔子，但孔子說：「三個人同行，其中一定有可以當我老師的人。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">是故弟子不必不如師，師不必賢於弟子，聞道有先後，術業有專攻，如是而已。</div>
+            <div class="translation">所以學生不一定比不上老師，老師也不一定比學生更賢能，只是懂得道理的時間有早有晚，在學術、技藝上各有專門的研究，如此罷了。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">李氏子蟠，年十七，好古文，六藝經傳皆通之，不拘於時，學於余。余嘉其能行古道，作《師說》以貽之。</div>
+            <div class="translation">李家的孩子名叫蟠，十七歲，愛好古文，六經的經文和傳記都精通，他不被當時恥於從師的風氣所限制，向我學習。我讚許他能實踐古人從師學習的道理，所以寫了這篇《師說》送給他。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">師者，「所以」</div><div class="back">用來...的（工具/憑藉）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">受業的「受」</div><div class="back">通「授」，傳授</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「師」道之不傳</div><div class="back">從師學習（動詞）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「其」下聖人</div><div class="back">指「今之眾人」（代名詞）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">習其「句讀」</div><div class="back">音ㄐㄩˋ ㄉㄡˋ，斷句</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「小學」而大遺</div><div class="back">小的方面要學習（古今異義）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">聖人無「常」師</div><div class="back">固定的</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「孔子師郯子」</div><div class="back">以...為師（意動用法）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">其「賢」不及</div><div class="back">才德、賢能（形容詞作名詞）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">術業有「專攻」</div><div class="back">專門的研究或學習</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「六藝」經傳</div><div class="back">指六經（詩、書、禮、樂、易、春秋）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「嘉」其能行</div><div class="back">讚許、獎勵</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「貽」之</div><div class="back">音ㄧˊ，贈送</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「古文」運動</div><div class="back">韓愈發起，主張「文以載道」</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">本文的「說」？</div><div class="back">文體名，用來論述道理</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>韓愈的老師觀</h3>
+        <ul>
+            <li><strong>職責：</strong>傳道（儒家精神）、受業（專業知識）、解惑（解答疑難）。</li>
+            <li><strong>標準：</strong>以「道」為師。不論地位、不論年齡，「道之所存，師之所存」。</li>
+            <li><strong>關係：</strong>弟子不必不如師，師不必賢於弟子（聞道有先後、術業有專攻）。</li>
+        </ul>
+        <hr>
+        <h3>三組對比批判（層遞法）</h3>
+        <ol>
+            <li><strong>古聖人 vs. 今眾人：</strong>聖人尚且從師，一般人卻以此為恥，導致聖愚差距擴大。</li>
+            <li><strong>愛其子 vs. 於其身：</strong>父母為子擇師，自己卻不學，是「小學大遺」的行為。</li>
+            <li><strong>巫醫樂師百工 vs. 士大夫：</strong>社會底層勞動者互相學習，士大夫卻互嘲從師，顯得士大夫不智。</li>
+        </ol>
+        <hr>
+        <h3>文學地位</h3>
+        <p>本文為中唐古文運動的重要文獻。韓愈藉由送李蟠這件小事，實際上在挑戰魏晉南北朝以來重門第、輕師道的社會惡習，確立了儒家教育的精神價值。</p>
+    </div>
+</section>
+
+<section id="article-7" class="article-section">
+    <h1>07 赤壁賦</h1>
+    <p class="subtitle">蘇軾 —— 泛舟赤壁的豁達哲學，從滄海一粟到萬物共適</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (15)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">考點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">壬戌之秋，七月既望，蘇子與客泛舟遊於赤壁之下。清風徐來，水波不興。舉酒屬客，誦明月之詩，歌窈窕之章。</div>
+            <div class="translation">宋神宗元豐五年（壬戌年）的秋天，七月十六日，我與朋友在赤壁下泛舟游玩。清風緩緩吹來，水面平靜得不起波紋。我舉起酒杯向客人勸酒，朗誦著〈明月〉詩，吟唱著〈窈窕〉章節。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">少焉，月出於東山之上，徘徊於斗牛之間。白露橫江，水光接天。縱一葦之所如，凌萬頃之茫然。浩浩乎如馮虛御風，而不知其所止；飄飄乎如遺世獨立，羽化而登仙。</div>
+            <div class="translation">不久，月亮從東山上升起，在斗宿和牛宿之間徘徊。白茫茫的霧氣橫貫江面，水光與天色相連。任憑小船隨處漂流，越過這廣闊無垠的江面。那遼闊的樣子，就像在天空中駕風飛行，不知道會在哪裡停下；那飄飄然的感覺，就像脫離人世獨立存在，化為羽仙而升入仙境。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">於是飲酒樂甚，扣舷而歌之。歌曰：「桂棹兮蘭槳，擊空明兮泝流光。渺渺兮予懷，望美人兮天一方。」</div>
+            <div class="translation">這時喝酒喝得非常高興，敲著船邊唱起歌來。歌詞說：「桂木做的棹啊，木蘭做的槳，擊打著清澈的水面，在流動的月光中逆流而上。我的心懷遙遠深長，思慕著那遠在天邊的美人。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">客有吹洞簫者，倚歌而和之。其聲嗚嗚然，如怨如慕，如泣如訴；餘音嫋嫋，不絕如縷。舞幽壑之潛蛟，泣孤舟之嫠婦。</div>
+            <div class="translation">客人中有一位吹洞簫的人，按著歌聲的節拍合奏。簫聲嗚嗚咽咽，像是哀怨，像是傾訴，又像是哭泣，像是告白；餘音悠長，像細絲般連綿不斷。這聲音能讓深谷中潛藏的蛟龍起舞，也能讓孤舟上的寡婦聽了落淚。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">蘇子愀然，正襟危坐而問客曰：「何為其然也？」客曰：「『月明星稀，烏鵲南飛』，此非曹孟德之詩乎？西望夏口，東望武昌，山川相繆，郁乎蒼蒼，此非曹孟德之困於周郎者乎？」</div>
+            <div class="translation">我神色憂傷起來，整好衣服端坐著問客人說：「為什麼簫聲會如此悲涼呢？」客人說：「『月明星稀，烏鵲南飛』，這不是曹操的詩句嗎？向西望是夏口，向東望是武昌，山川環繞，一片鬱鬱蔥蔥，這不就是曹操被周瑜圍困的地方嗎？」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「方其破荊州，下江陵，順流而東也，舳艫千里，旌旗蔽空，釃酒臨江，橫槊賦詩，固一世之雄也，而今安在哉？」</div>
+            <div class="translation">「當他攻破荊州，拿下江陵，順著長江向東進發時，戰船首尾相連千里，旌旗遮蔽了天空；他面對大江斟酒，橫橫著長矛吟詩，確實是一代的英雄啊，但現在他在哪裡呢？」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「寄蜉蝣於天地，渺滄海之一粟。哀吾生之須臾，羨長江之無窮。挾飛仙以遨遊，抱明月而長終。知不可乎驟得，託遺響於悲風。」</div>
+            <div class="translation">「你我只是天地間短暫生存的蜉蝣，渺小得像大海裡的一顆小米。哀嘆我們生命的短暫，羨慕長江的永恆無窮。想要帶著仙人去漫遊，與明月一起長存。知道這些無法立刻得到，才把這哀傷的餘音寄託在悲涼的風中。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">蘇子曰：「客亦知夫水與月乎？逝者如斯，而未嘗往也；盈虛者如彼，而卒莫消長也。蓋將自其變者而觀之，則天地曾不能以一瞬；自其不變者而觀之，則物與我皆無盡也，而又何羨乎！」</div>
+            <div class="translation">我說：「你了解那水和月亮嗎？不斷流逝的就像這江水，但它其實從未真正流去（江水依舊在）；月亮時圓時缺就像那樣，但它終究沒有增減。如果從『變』的角度來看，天地萬物連一瞬間都無法保持原狀；但如果從『不變』的角度來看，萬物與我們都是永恆無盡的，又有什麼好羨慕的呢？」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「且夫天地之間，物各有主，苟非吾之所有，雖一毫而莫取。惟江上之清風，與山間之明月，耳得之而為聲，目遇之而成色，取之無禁，用之不竭，是造物者之無盡藏也，而吾與子之所共適。」</div>
+            <div class="translation">「況且天地之間，萬物各有主人，如果不是我擁有的，即使一丁點也不強求。只有這江面上的清風，與山間的明月，耳朵聽到了就成美妙的聲音，眼睛看到了就成美麗的色彩，獲取它們無人禁止，享用它們永不枯竭，這是大自然無窮無盡的寶藏，也是你我能共同享受的。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">客喜而笑，洗盞更酌。肴核既盡，杯盤狼籍。相與枕藉乎舟中，不知東方之既白。</div>
+            <div class="translation">客人高興地笑了，洗淨杯子重新倒酒。下酒菜和果品吃完了，杯盤散亂一地。大家在船中互相枕著睡著了，不知道東方天色已經發白。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">七月「既望」</div><div class="back">農曆十六日（望是十五）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">舉酒「屬」客</div><div class="back">音ㄓㄨˇ，勸酒</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">如「馮」虛御風</div><div class="back">音ㄆㄧㄥˊ，通「憑」，依託</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「扣」舷而歌</div><div class="back">敲擊</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">倚歌而「和」</div><div class="back">音ㄏㄜˋ，應和、跟著唱</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">餘音「嫋嫋」</div><div class="back">音ㄋㄧㄠˇ，形容聲音悠揚</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">泣孤舟之「嫠」婦</div><div class="back">音ㄌㄧˊ，寡婦</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">蘇子「愀然」</div><div class="back">音ㄑㄧㄠˇ，容色改變、憂愁的樣子</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「正襟危坐」</div><div class="back">危：端正。指端莊嚴肅地坐著</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「釃」酒臨江</div><div class="back">音ㄕ，斟酒、灑酒</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">橫「槊」賦詩</div><div class="back">音ㄕㄨㄛˋ，長矛</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">滄海一「粟」</div><div class="back">音ㄙㄨˋ，小米（喻極其渺小）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">哀吾生之「須臾」</div><div class="back">極短的時間</div></div></div>
+            <div class="flashcard" onclick="this.classList.toggle('flipped')"><div class="flashcard-inner"><div class="front">杯盤「狼籍」</div><div class="back">散亂不整齊的樣子</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「枕藉」</div><div class="back">互相枕靠著（藉音ㄐㄧㄝˋ）</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>情感脈絡與結構</h3>
+        <ul>
+            <li><strong>樂：</strong>清風明月，遺世獨立（泛舟之樂）。</li>
+            <li><strong>悲：</strong>蕭聲悲涼，感嘆英雄逝去、生命渺小（滄海一粟）。</li>
+            <li><strong>悟：</strong>變與不變的哲思，造物者無盡藏（豁達解脫）。</li>
+        </ul>
+        <hr>
+        <h3>核心哲思：變與不變</h3>
+        <p>蘇軾利用「水」與「月」作為意象：</p>
+        <ul>
+            <li><strong>自其變者觀之：</strong>天地曾不能以一瞬（世界恆變）。</li>
+            <li><strong>自其不變者觀之：</strong>物與我皆無盡也（精神與自然永恆）。</li>
+        </ul>
+        <hr>
+        <h3>賦體的特色</h3>
+        <p>本文屬於「散賦」（文賦），打破了傳統賦體嚴格的對仗與韻律，大量加入散文化的句子，使得氣氛更流暢，適合抒情與論理。</p>
+        <hr>
+        <h3>歷史背景</h3>
+        <p>寫於蘇軾被貶黃州期間。雖然身處政治逆境，但蘇軾透過儒家的責任感、道家的超脫與佛家的空靈，建立了一套自我療癒的生命系統。</p>
+    </div>
+</section>
+
+<section id="article-8" class="article-section">
+    <h1>08 項脊軒志</h1>
+    <p class="subtitle">歸有光 —— 於瑣碎中見真情，中國散文中「最溫柔的思念」</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (12)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">重點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">項脊軒，舊南閣子也。室僅方丈，可容一人居。百年老屋，塵泥滲漉，雨澤下注；每移案，顧視無可置者。又北向，不能得日，日過午已昏。</div>
+            <div class="translation">項脊軒，就是以前的南閣子。房間面積只有一丈見方，僅能容納一個人居住。這是一間百年的老房子，天花板滲漏著泥土，雨水也向下流；每次移動書桌，環顧四周都沒有可以安放的地方。加上它朝北，照不到陽光，太陽一過中午室內就昏暗了。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">余稍為修葺，使不漏。前闢四窗，垣牆周庭，以當南日，日影反照，室始洞然。又雜植蘭桂竹木於庭，古玩、疏疏節節，稍修葺，使不漏。</div>
+            <div class="translation">我稍微修補了一下，使它不再漏雨。在前面開了四扇窗戶，並在庭院四周築起圍牆，用來擋住南邊射來的陽光，讓日光反射進屋，室內才明亮起來。我又在庭院裡雜種了蘭花、桂樹、竹子和樹木，加上舊有的欄杆，增添了層次美感。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">借書滿架，偃仰嘯歌，冥然兀坐，萬籟有聲；而庭階寂寂，小鳥時來啄食，人至不知去。三五之夜，明月半牆，桂影斑駁，風移影動，珊珊可愛。</div>
+            <div class="translation">借來的書堆滿了書架，我在這裡安居長吟，有時靜靜地獨坐，聽到大自然萬物發出的各種聲音。庭院的階梯前寂靜無聲，小鳥時常飛來啄食，人走到了跟前牠們也不飛走。農曆十五的夜晚，明亮的月光照在半截牆上，桂樹的影子交錯參差，清風吹過，影子隨之晃動，那輕柔飄動的樣子非常可愛。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">然余居於此，多可喜，亦多可悲。先是，庭中通南北為一。迨諸父異爨，內外多置小門，牆往往而是。東犬西吠，客逾庖而宴，雞棲於廳。庭中始為籬，已為牆，凡再變矣。</div>
+            <div class="translation">然而我住在這，有很多開心的事，也有很多可悲的事。在這之前，庭院南、北是相通的一體。等到伯叔們分家，屋子內外加裝了許多小門，牆壁到處都是。東家的狗對著西家叫，客得要穿過廚房去赴宴，雞也養在客廳裡。庭院中開始是築籬笆，後來又築牆，總共變動了兩次。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">家有老嫗， 嘗居於此。嫗，先大母婢也，乳二世，先妣撫之甚厚。</div>
+            <div class="translation">家裡有一位老婦人，曾經住在這。她是亡祖母的婢女，哺育過我家兩代人，亡母生前對她非常好。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">嫗每謂余曰：「某所，而母立於茲。」嫗又曰：「汝姊在吾懷，呱呱而泣；娘以指叩門扉曰：『兒寒乎？欲食乎？』吾從板外相應。」語未畢，余泣，嫗亦泣。</div>
+            <div class="translation">老婦人常對我說：「那地方，就是你母親生前站立的位置。」她又說：「你姊姊當時在我懷裡呱呱大哭；你母親用手指敲著門板問：『孩子冷嗎？想吃東西嗎？』我在門板外回答她。」話還沒說完，我哭了，老婦人也跟著哭了。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">余自束髮讀書軒中，一日，大母過餘曰：「吾兒，久不見若影，何竟日默默在此，大類女郎也？」比去，以手闔門，自語曰：「吾家讀書久不效，兒之成，則可待乎！」</div>
+            <div class="translation">我從少年時期就在軒中讀書。有一天，祖母來看我說：「我的乖孫，好久沒看到你的身影，怎麼整天靜靜地待在這裡，真像個女孩子？」臨走時，她用手合上門，自言自語說：「我們家的人考科舉很久沒成就了，這孩子的成功，是可以期待的吧！」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">頃之，持一象笏至，曰：「此吾祖太常公宣德間執本朝，他日汝當用之！」瞻顧遺跡，如在昨日，讓人增感。</div>
+            <div class="translation">不久，她拿著一個象牙做的手板（笏）過來，說：「這是我祖父太常公在宣德年間上朝時用的，以後你應當會用到它！」回想這些往事遺蹟，就像發生在昨天一樣，讓人忍不住悲傷。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">庭有枇杷樹，吾妻死之年所手植也，今已亭亭如蓋矣。</div>
+            <div class="translation">庭院中有一棵枇杷樹，是我妻子去世那年親手種植的，現在已經長得高大挺拔，枝葉茂密像傘蓋一樣了。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">室僅「方丈」</div><div class="back">一丈見方（約 10 平方公尺）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「偃仰」嘯歌</div><div class="back">安居休息、俯仰之間</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「冥然」兀坐</div><div class="back">靜默、深思的樣子</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">萬「籟」有聲</div><div class="back">音ㄌㄞˋ，自然界的聲響</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「三五」之夜</div><div class="back">農曆十五日</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「迨」諸父異爨</div><div class="back">音ㄉㄞˋ，等到</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">諸父「異爨」</div><div class="back">音ㄘㄨㄢˋ，分家、各起爐灶</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">東犬「西吠」</div><div class="back">借代：家族不睦、分家後的隔閡</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">逾「庖」而宴</div><div class="back">音ㄆㄠˊ，廚房</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「先妣」</div><div class="back">亡母</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「象笏」</div><div class="back">音ㄏㄨˋ，古代大臣上朝拿的手板</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「亭亭」如蓋</div><div class="back">高聳直立的樣子</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>情感層次分析</h3>
+        
+        <ol>
+            <li><strong>喜：</strong>修葺後的清幽環境，與讀書生活的閒適（萬籟有聲、月下桂影）。</li>
+            <li><strong>悲（家族）：</strong>分家後的混亂與頹敗（東犬西吠、籬牆變更）。</li>
+            <li><strong>悲（親情）：</strong>透過老嫗憶亡母、祖母的期待（象笏的傳承）。</li>
+            <li><strong>悲（亡妻）：</strong>以枇杷樹的成長對比人的逝去（神來之筆，含蓄深沉）。</li>
+        </ol>
+        <hr>
+        <h3>寫作特色：以小見大</h3>
+        <ul>
+            <li><strong>空間與記憶：</strong>將「項脊軒」這個小空間作為情感的載體，串聯起三代人的往事。</li>
+            <li><strong>細節與真情：</strong>不直接說「我很難過」，而是寫母親的「兒寒乎」、祖母的「手闔門」、妻子的「枇杷樹」。這種「不著一字，盡得風流」的手法是歸有光的最高成就。</li>
+        </ul>
+        <hr>
+        <h3>文學地位</h3>
+        <p>歸有光反對明代當時流行的「模擬古人」風氣（擬古主義），主張文章應抒發真實情感。他的風格直接影響了清代的桐城派，被尊為「明文第一」。</p>
+    </div>
+</section>
+
+
+<section id="article-9" class="article-section">
+    <h1>09 晚遊六橋待月記</h1>
+    <p class="subtitle">袁宏道 —— 獨到的西湖審美，避開塵囂，尋找「性靈」之美</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (12)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">重點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">西湖最盛，為春為月。一日之盛，為朝煙，為夕嵐。</div>
+            <div class="translation">西湖最美的時刻，是在春天和有月亮的夜晚。而一天之中最美的時刻，則是早晨的煙霧與傍晚的山雲。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">今歲春雪甚盛，梅花為寒所勒，與杏桃相次開發，尤為妍雅。</div>
+            <div class="translation">今年的春雪下得很大，梅花被寒氣所抑制，直到現在才跟杏花、桃花相繼開放，景致顯得特別美妙高雅。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">傅金吾園中梅，張功甫家故物也，急往觀之。其實湖光染翠之工，山嵐設色之妙，皆在朝日始出，夕舂未下，始極其濃媚。</div>
+            <div class="translation">傅金吾園裡的梅花，是張功甫家留下來的舊物，我急忙跑去觀賞。但其實湖水反映著翠綠山影的精巧，以及山間雲霧渲染色彩的神妙，都在太陽剛升起，或是夕陽尚未下山之際，才顯得最為濃豔嫵媚。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">月景尤不可言，花態柳情，山容水意，別是一種番樣。</div>
+            <div class="translation">月光下的景色更是美得無法用言語形容，花朵的姿態與柳樹的情調，山的容貌與水的意境，都展現出另一種與白天完全不同的風貌。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">末至者，獨「月景」一事，余之所極賞。</div>
+            <div class="translation">可惜大多數遊客只知道白天的熱鬧，真正領略到「月夜美景」的人，其實只有我最為推崇賞識。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">杭人遊湖，巳出酉歸，避月如仇。</div>
+            <div class="translation">杭州人遊覽西湖，上午九點（巳時）出發，下午五點（酉時）就回家了，躲避月亮簡直像躲避仇人一樣。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">不知桃花爛漫，綠煙紅霧，瀰漫二十餘里。歌吹為風，粉汗為雨，羅紈之盛，多於堤畔之草，亦極為盛。</div>
+            <div class="translation">他們不知道當桃花燦爛盛開時，綠色的柳絲如煙，紅色的花朵如霧，美景綿延二十多里。歌聲笛聲隨風飄散，遊客多得汗流如雨，穿著絲綢衣裳的遊客，比堤岸上的草還要多，這景象雖然也極其壯觀。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">然其趣，亦不在是。</div>
+            <div class="translation">然而，西湖真正的趣味，其實並不在這些熱鬧擁擠的地方。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「既望」與「望」</div><div class="back">望：農曆15；既望：農曆16</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">梅花為寒所「勒」</div><div class="back">抑制、束縛</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">尤為「妍」雅</div><div class="back">音ㄧㄢˊ，美麗</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">染翠之「工」</div><div class="back">精巧（指人工美）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">設色之「妙」</div><div class="back">神妙（指自然美）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「夕舂」未下</div><div class="back">音ㄔㄨㄥ，指夕陽</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">別是一種「番樣」</div><div class="back">不一樣的樣貌</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">巳出「酉」歸</div><div class="back">下午 5 點到 7 點</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「綠煙紅霧」</div><div class="back">借代：綠柳紅花</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「羅紈」之盛</div><div class="back">音ㄨㄢˊ，借代：穿著華麗衣裳的人群</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">獨抒「性靈」</div><div class="back">主張表現真實的情感與個性（公安派核心）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">公安派「三袁」</div><div class="back">袁宗道、袁宏道、袁中道</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>審美觀點的對比</h3>
+        
+        <table border="1" style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr style="background:#eee;"><th>對比項</th><th>杭人（俗）</th><th>作者（雅）</th></tr>
+            <tr><td><strong>時間</strong></td><td>巳出酉歸（白天）</td><td>朝煙、夕嵐、月夜</td></tr>
+            <tr><td><strong>景物</strong></td><td>羅紈、堤畔之草（人擠人）</td><td>花態柳情、山容水意</td></tr>
+            <tr><td><strong>感受</strong></td><td>熱鬧（歌吹為風）</td><td>性靈之趣、別有番樣</td></tr>
+        </table>
+        <hr>
+        <h3>文學風格：獨抒性靈</h3>
+        <ul>
+            <li><strong>不拘格套：</strong>反對明代前、後七子的「擬古主義」。</li>
+            <li><strong>情感真實：</strong>強調文章應該表現個人的真實面貌與情感（性靈）。</li>
+            <li><strong>語言自然：</strong>使用較多口語化的詞彙（如「番樣」、「避月如仇」），讓文章生動活潑。</li>
+        </ul>
+        <hr>
+        <h3>關鍵意象分析</h3>
+        <p><strong>「梅」與「桃」：</strong>作者雖然「急往觀梅」，但其實他真正想看的是「月夜之美」。這是一種層進式的筆法，用梅花的雅引出西湖更深層的、不為人知的「月景」。</p>
+    </div>
+</section>
+
+<section id="article-10" class="article-section">
+    <h1>10 虯髯客傳</h1>
+    <p class="subtitle">杜光庭 —— 唐代傳奇經典，俠義與天命交織的英雄史詩</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (15)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">人物與考點</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">隋煬帝之幸江都也，命司空楊素守西京。素驕貴，禮節甚踞，賓客謁見者，必踞床而見。</div>
+            <div class="translation">隋煬帝到江都巡遊時，命令司空楊素留守西京長安。楊素地位顯赫且為人驕橫，禮節非常傲慢，賓客去拜見他時，他一定斜坐著接見。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">布衣李靖，獻奇策，素亦踞見。靖前揖曰：「天下方亂，英雄競起。公為帝室重臣，須收羅豪傑，不宜踞見賓客。」素斂容而起，謝之，與語甚悅。</div>
+            <div class="translation">平民李靖前來獻上奇策，楊素也是斜坐著見他。李靖上前作揖說：「現在天下大亂，英雄四起。您身為帝室重臣，應該收羅人才，不該如此傲慢。」楊素立刻收起傲慢的神色起身道歉，跟李靖談得很開心。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">素之執拂妓，目李靖，從之。中夜，妓潛至李靖所，曰：「妾侍楊司空久，閱人多矣，無如公者。絲蘿非獨生，願託喬木。」靖與之俱去。</div>
+            <div class="translation">楊素身邊一名手持絲拂的歌妓（紅拂女）看中了李靖，決定跟隨他。半夜，她潛逃到李靖住處，說：「我服侍楊司空很久，見過的人很多，沒有一個像您這樣的。絲蘿不能獨立生長，我願意依附於您這棵喬木。」李靖便帶著她一起逃離長安。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">至靈石旅舍，有一人乘紅馬，投革囊於前，取枕欹臥，看妓梳頭。靖怒，妓示意，靖即按怒。</div>
+            <div class="translation">兩人到了靈石的旅館，有一個騎紅馬的人（虯髯客）過來，把皮袋丟在面前，斜靠著枕頭躺下，看著歌妓梳頭。李靖很生氣，歌妓示意他冷靜，李靖才按捺住怒氣。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">客問靖姓，靖語之。問妓，語曰：「楊司空妓。」客曰：「吾聞楊素死矣，何以至此？」語之以情。客曰：「此革囊中，天下之負心者也。吾已得之，方欲食其心肝，何以相讓？」</div>
+            <div class="translation">那人問李靖姓名，李靖告訴了他。又問歌妓身分，歌妓說：「是楊司空的歌妓。」客問：「聽說楊素死了，你們怎麼到這的？」兩人如實告知。客指著皮袋說：「這袋子裡裝的是天下的負心漢。我已經抓到了，正想吃他的心肝解恨，怎麼可能分給你們？」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">客曰：「太原有異人乎？」靖曰：「有李氏子，將帥之才也。」客曰：「吾欲觀之。公為我約之。」</div>
+            <div class="translation">客問：「太原那邊有什麼奇才嗎？」李靖說：「有個姓李的年輕人（李世民），有將帥之才。」客說：「我想見見他，請你幫我約見。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">客見李世民，神氣清朗，滿坐風生。客蹙然曰：「真天子也！」退而語靖曰：「此局全輸矣。此地已有真主，吾當他求。」</div>
+            <div class="translation">虯髯客見到李世民，見他神采奕奕，坐在一旁就感到威風凜凜。虯髯客眉頭一皺說：「這真是天子啊！」退出來對李靖說：「這局棋我全輸了。這裡既然已經有了真主，我應當去別處發展。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">客盡以家產贈靖，曰：「以此助真主。吾當適異國，圖王霸之事。」</div>
+            <div class="translation">虯髯客將所有家產贈送給李靖，說：「用這些錢輔佐真主吧。我要去外國，謀求王霸之業了。」</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「踞」床而見</div><div class="back">斜坐、傲慢的坐姿</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「絲蘿」非獨生</div><div class="back">借代：女子（比喻需依附他人）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">願託「喬木」</div><div class="back">借代：優秀的男子（比喻依靠者）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">取枕「欹」臥</div><div class="back">音ㄑㄧ，傾斜、歪斜</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">客「蹙」然曰</div><div class="back">音ㄘㄨˋ，眉頭緊皺（指心神不寧）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「真主」之意</div><div class="back">真命天子（指李世民）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「適」異國</div><div class="back">往、前往</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「傳奇」體裁</div><div class="back">唐代的文言短篇小說</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「風塵三俠」</div><div class="back">虯髯客、李靖、紅拂女</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「負心者」</div><div class="back">指忘恩負義的人</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「延」靖入</div><div class="back">邀請、引導</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「弈」之意</div><div class="back">下棋（文中暗指爭奪天下）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「尸居餘氣」</div><div class="back">形容人垂頭喪氣或即將死亡（指楊素）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「扶餘國」</div><div class="back">虯髯客最後建功立業之處</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">杜光庭身分</div><div class="back">唐末五代著名的道士</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>人物性格與功能</h3>
+        <ul>
+            <li><strong>紅拂女：</strong>慧眼識英雄，敢於追求愛情與前途（主動性極強）。</li>
+            <li><strong>李靖：</strong>英俊瀟灑、沈穩有禮，是紅拂與虯髯之間的橋樑。</li>
+            <li><strong>虯髯客：</strong>豪邁不羈、能屈能伸。當發現李世民是「真主」時，能果斷放棄野心（極具俠氣）。</li>
+        </ul>
+        <hr>
+        <h3>核心考點：天命思想</h3>
+        <p>本文的主旨是為了論證**「唐室天命所歸」**。連強大的虯髯客看到李世民都要甘拜下風，說明天下不是靠武力爭奪就能得到的，必須具備「天命」。</p>
+        <hr>
+        <h3>小說技巧：側面烘託</h3>
+        <p>作者不直接寫李世民有多強，而是透過**虯髯客的反應**（眉頭緊皺、認輸）來襯托李世民的天子氣概。這種「以強襯更強」的手法是小說寫作的經典範例。</p>
+    </div>
+</section>
+
+<section id="article-11" class="article-section">
+    <h1>11 勞山道士</h1>
+    <p class="subtitle">蒲松齡 —— 《聊齋志異》經典，諷刺投機取巧與好逸惡勞的警世恆言</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (15)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">重點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">邑有王生，行七，故家子。少慕道，聞勞山多仙，負笈往游。</div>
+            <div class="translation">縣裡有個姓王的年輕人，在家排行第七，是世家大族的子弟。他從小羨慕道術，聽說勞山有很多仙人，就背著書箱前往遊覽。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">登一頂，有觀宇甚幽。一道士坐蒲團上，素髮垂領，而神光爽俊。叩而與語，理甚玄妙。請師之，道士曰：「恐嬌惰不能作苦。」答曰：「能之。」</div>
+            <div class="translation">他登上一個山頂，看到一座道觀非常幽靜。一個道士坐在蒲團上，白髮垂到肩領，神采奕奕。王生上前敲門與他談話，發現道理非常玄妙。王生請求拜他為師，道士說：「恐怕你嬌生慣養懶惰，不能吃苦。」王生回答說：「我能吃苦。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">其門人甚眾，薄暮畢集。王生俱與稽首，遂留觀中。凌晨，道士呼王生，授以斧，使隨眾採樵。王生謹受教。</div>
+            <div class="translation">道士的弟子很多，傍晚時分全都到齊了。王生一一跟他們行禮，就留在觀中。清晨，道士叫醒王生，給他一把斧頭，讓他跟著大家去砍柴。王生恭敬地接受了教導。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">過月餘，手足重繭，不堪其苦，陰有歸志。一夕歸，見二人與師共飲。日影已沒，明月未出，道士剪紙如鏡，粘壁間，俄頃，月明輝室，光鑒毫芒。</div>
+            <div class="translation">過了一個多月，王生手腳都磨出了厚繭，難以忍受砍柴的痛苦，私下有了回家的念頭。一天晚上砍柴回來，看見兩個人正跟師父喝酒。太陽已落山，月亮還沒出來，道士剪了一塊像鏡子圓的紙，貼在牆上。一會兒，那紙就化作明月，照亮全屋，光亮得可以照見細微的汗毛。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">道士曰：「良夜美景，不可不同樂。」遂於案上取壺酒，分賚諸徒，且囑盡醉。王生自思：徒眾數十，一壺酒哪能遍給？俄而各取盂碗，競飲先釂，而壺中酒不竭。王生心甚異之。</div>
+            <div class="translation">道士說：「良夜美景，不可不共同歡樂。」於是從桌上取出一壺酒，分給眾弟子，並叮囑大家喝個痛快。王生心想：弟子有幾十人，一壺酒哪夠分？一會兒大家各自拿著碗，爭先乾杯，而壺裡的酒卻一點也沒減少。王生心裡對此感到非常奇怪。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">一客曰：「蒙賜月明之照，乃爾寂飲，何不呼嫦娥來？」道士箸擲月中，見一美人，自月出。初不盈尺，至地，遂與人等。翩翩作霓裳舞。</div>
+            <div class="translation">一位客人說：「承蒙賜予明月光照，就這樣靜靜地喝酒，為什麼不叫嫦娥出來呢？」道士將一根筷子丟進月亮中，只見一個美人從月影中走出來。剛開始不到一尺高，落到地上後就跟人一樣高。她翩翩起舞，跳起了霓裳羽衣舞。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">王生又過月餘，苦不可忍，而道士並不傳教一術。語道士曰：「臣為千里而來，今砍樵三月，願請一小術。」道士笑問：「何術可？」生曰：「常看師父穿牆而過，以此足矣。」</div>
+            <div class="translation">王生又過了一個多月，痛苦得無法忍受，而道士卻一點法術也沒教他。他對道士說：「我從千里之外趕來，現在砍柴三個月了，希望能教我一點小法術。」道士笑著問：「你想學什麼法術？」王生說：「常看師父穿牆而過，只要能學會這個就滿足了。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">道士傳以咒，使自演。王生對牆不敢入。道士曰：「進之！」王生果直入，覺若無物。</div>
+            <div class="translation">道士教了他一段咒語，讓他自己演練。王生面對牆壁不敢進去。道士說：「進去！」王生果然直衝過去，感覺身體像穿過空氣一樣沒有阻礙。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">王生歸，自誇遇仙。其妻不信。王生效其法，去牆數尺，奔而入；頭觸硬壁，然跌。妻趨視之，額上生巨疕，如雞卵。妻譏之，王生慚忿，罵老道士之無良也。</div>
+            <div class="translation">王生回到家，吹噓自己遇到了神仙。他妻子不信。王生演練法術，離牆幾尺遠，快步衝進去；結果頭撞到了堅硬的牆壁，頹然跌倒。妻子趕快過去看，見他額頭上起了一個大腫塊，像雞蛋一樣。妻子嘲笑他，王生既羞慚又氣憤，大罵老道士沒良心。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「負笈」往游</div><div class="back">音ㄐㄧˊ，背著書箱</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">神光「爽俊」</div><div class="back">神采奕奕、英俊不凡</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「稽首」之禮</div><div class="back">音ㄑㄧˇ ㄕㄡˇ，古代最敬禮</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">採「樵」</div><div class="back">音ㄑㄧㄠˊ，柴薪</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">手足重「繭」</div><div class="back">厚皮、老繭</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">分「賚」諸徒</div><div class="back">音ㄌㄞˋ，賜予、賞賜</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「俄頃」</div><div class="back">一會兒、極短的時間</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">光「鑒」毫芒</div><div class="back">照、反射</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">先「釂」</div><div class="back">音ㄐㄧㄠˋ，飲盡杯中酒</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「初不盈尺」</div><div class="back">剛開始不滿一尺</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「逡巡」</div><div class="back">音ㄑㄩㄣ ㄒㄩㄣˊ，徘徊、猶豫不前</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「兀」然</div><div class="back">音ㄨˋ，頹然、昏沉的樣子</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">額上生巨「疕」</div><div class="back">音ㄅㄧˇ，頭瘡、腫塊</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">蒲松齡自號</div><div class="back">柳泉居士</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">聊齋志異文體</div><div class="back">文言短篇志怪小說（孤憤之書）</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>人物形象對比</h3>
+        <ul>
+            <li><strong>王生：</strong>出身名門、好逸惡勞、心術不正（只想學穿牆術回家炫耀）。</li>
+            <li><strong>老道士：</strong>道法高深、看穿王生本質、授課因材施教（透過勞動磨練其心性，但王生不改其志）。</li>
+        </ul>
+        <hr>
+        <h3>故事情節與諷刺點</h3>
+        
+        <ol>
+            <li><strong>求仙動機：</strong>非為了求道，而是為了尋找捷徑。</li>
+            <li><strong>幻境描寫：</strong>剪紙明月、酒飲不竭、嫦娥共舞，營造出強烈的超現實感，與王生現實中的「重繭」形成鮮明對比。</li>
+            <li><strong>最終失敗：</strong>道士囑咐王生必須「心誠則靈」且不可炫耀，王生回頭即破戒。這說明了**「德行不足，術不可守」**的道理。</li>
+        </ol>
+        <hr>
+        <h3>聊齋志異的文學地位</h3>
+        <p>蒲松齡自稱這本書是他的「孤憤之書」，透過寫狐、寫鬼、寫妖，實際上在諷刺當時清初社會的黑暗、科舉的腐敗以及人性的醜陋。本文則精準打擊了社會上那些「不務實而求速成」的浮躁心態。</p>
+    </div>
+</section>
+
+<section id="article-12" class="article-section">
+    <h1>12 大同與小康</h1>
+    <p class="subtitle">《禮記‧禮運》—— 儒家社會理想的最高指導原則</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (12)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">重點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">昔者仲尼與於蜡賓，事畢，出遊於觀之上，喟然而歎。仲尼之歎，蓋歎魯也。言偃在側，曰：「君子何歎？」</div>
+            <div class="translation">從前孔子參加魯國的蜡祭並擔任助祭官。祭典結束後，他走到宮門外的看台上遊覽，不禁感慨長嘆。孔子的嘆息，大概是在感嘆魯國現狀（禮崩樂壞）。學生言偃（子游）在身邊問：「老師為什麼嘆息呢？」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">孔子曰：「大道之行也，天下為公。選賢與能，講信修睦。故人不獨親其親，不獨子其子；使老有所終，壯有所用，幼有所長，矜、寡、孤、獨、廢疾者，皆有所養。」</div>
+            <div class="translation">孔子說：「當大道實行的時代，天下是公有的。選拔賢才，推舉能者，講求信用，追求和睦。所以人們不單只親愛自己的親人，不單只疼愛自己的子女；使老人能安享晚年，壯年人能貢獻才力，幼童能健全成長，至於老而無夫、老而無妻、幼而無父、老而無子及殘廢疾病的人，都能得到國家的撫養。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「貨，惡其棄於地也，不必藏於己；力，惡其不出身也，不必為己。是故謀閉而不興，盜竊亂賊而不作，故外戶而不閉。是謂『大同』。」</div>
+            <div class="translation">「資源，是怕被丟棄荒廢在地上，但不一定要藏為私有；勞力，是怕不從自己身上使出來（不去服務社會），但勞動不只是為了自己。因此，陰謀詭計被杜絕而不產生，盜竊、造反、害人的事不會發生，所以連大門都不必關。這就叫做『大同』世界。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「今大道既隱，天下為家。各親其親，各子其子，貨力為己。大人世及以為禮，城郭溝池以為固。禮義以為紀。」</div>
+            <div class="translation">「現在大道已經隱沒，天下變成了私有。人人只親愛自己的親人，只疼愛自己的子女，資源與勞力都只為私利。天子諸侯把位子傳給子弟變成禮制，築起城牆深溝來鞏固政權。並以禮義作為治理國家的綱紀。」</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">「以正君臣，以篤父子，以睦兄弟，以和夫婦，以設制度，以立田里，以賢勇知，以功為己。故謀用是作，而兵由此起。禹、湯、文、武、成王、周公，由此其選也。此六君子者，未有不謹於禮者也。以著其義，以考其信，著有過，刑仁講讓，示民有常。如有不由此者，在埶者去，眾以為殃。是謂『小康』。」</div>
+            <div class="translation">「用禮義來端正君臣關係，使父子親厚，使兄弟和睦，使夫妻和諧，用來建立制度，劃分田地疆界，尊重勇敢聰明的人，把功勞歸於自己。因此，陰謀詭計從此產生，戰爭也由此爆發。夏禹、商湯、周文王、周武王、周成王、周公，是這時代的代表。這六位君子，沒有一個不嚴謹遵守禮制的。他們以此彰顯正義，考驗誠信，揭發過錯，以仁為法，講求禮讓，向百姓示範常法。如果有不遵守禮義的人，當權者會被罷黜，大眾視之為禍殃。這就叫做『小康』社會。」</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">與於「蜡」賓</div><div class="back">音ㄓㄚˋ，歲末大祭名</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">選賢「與」能</div><div class="back">音ㄐㄩˇ，通「舉」：推舉</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">講信「修」睦</div><div class="back">脩（修）：講求、習</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「矜」寡孤獨</div><div class="back">音ㄍㄨㄢ，通「鰥」：老而無妻</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「謀閉」而不興</div><div class="back">陰謀詭計停絕閉塞</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「外戶」而不閉</div><div class="back">大門</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「世及」以為禮</div><div class="back">父死傳子（世）、兄死傳弟（及）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">禮義以為「紀」</div><div class="back">綱紀、準則</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">以「賢」勇知</div><div class="back">以...為賢（意動用法）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「刑」仁講讓</div><div class="back">通「型」：以...為典範</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">在「埶」者去</div><div class="back">埶通「勢」：權位</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">《禮記》地位</div><div class="back">十三經之一，屬經部。</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>「大同」與「小康」比較表</h3>
+        <table border="1" style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr style="background:#eee;"><th>比較項目</th><th>大同（理想型）</th><th>小康（現實型）</th></tr>
+            <tr><td><strong>代表時代</strong></td><td>五帝（黃帝、堯、舜等）</td><td>三代（夏、商、周）</td></tr>
+            <tr><td><strong>政治核心</strong></td><td>天下為公（讓賢）</td><td>天下為家（世襲）</td></tr>
+            <tr><td><strong>社會倫理</strong></td><td>人不獨親其親（博愛）</td><td>各親其親（私愛）</td></tr>
+            <tr><td><strong>資源觀念</strong></td><td>貨惡棄地，不藏於己</td><td>貨力為己</td></tr>
+            <tr><td><strong>治理方式</strong></td><td>不言而治（自然和睦）</td><td>禮義以為紀（法律制度）</td></tr>
+            <tr><td><strong>結果</strong></td><td>謀閉不興、外戶不閉</td><td>謀用是作、兵由此起</td></tr>
+        </table>
+        <hr>
+        <h3>核心考點</h3>
+        <ul>
+            <li><strong>修辭技巧：</strong>運用大量「排比」與「層遞」，如「老有所終，壯有所用...」這段是大考默寫與理解的熱點。</li>
+            <li><strong>思想變遷：</strong>孔子雖嚮往「大同」，但認為「小康」是現實中可以追求的目標（透過禮樂教化）。</li>
+            <li><strong>名詞定義：</strong>注意「矜、寡、孤、獨」的具體借代對象，這在翻譯題中極常出現。</li>
+        </ul>
+    </div>
+</section>
+
+<section id="article-13" class="article-section">
+    <h1>13 勸和論</h1>
+    <p class="subtitle">鄭用錫 —— 臺灣第一進士的和平呼聲，消弭族群械鬥的理感之作</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (12)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">重點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">甚矣，人心之變也！自我而觀之，人盡夫也；天自其生者而觀之，人盡兄弟也。奈何同類相殘，其禍至於不可勝言。</div>
+            <div class="translation">人心變得太厲害了！從我自己的角度來看，大家都是人；從天生萬物的角度來看，大家都是兄弟。為什麼要同類相殘，造成的禍害到了無法形容的地步。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">矧同為一府，亦同為一縣，甚至同為一村。其間由睽隔而生嫌隙，由嫌隙而起鬥狠，甚至於破家亡身。</div>
+            <div class="translation">何況大家同住一府、一縣，甚至同住一村。其間由疏遠而產生隔閡，由隔閡而引起鬥爭凶狠，甚至到了傾家蕩產、喪失性命的地步。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">顧其始，不過分隸漳、泉、閩、粵。而後此之分，竟分於械鬥；而後此之分，竟分於王法。甚至同氣兄弟、同胞子姓，亦由是而分。</div>
+            <div class="translation">回顧最初，不過是區分籍貫是漳州、泉州、閩南或粵東。但之後的區分，竟然區分在械鬥的立場上；再之後的區分，竟然區分在法律刑責（誰犯罪、誰受罰）上。甚至同根生的兄弟、同家族的子孫，也因此而分裂。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">夫普天之下，莫非王土；食毛踐土，亦皆王臣。況臺灣一島，原本荒昧，與內地各省不同。</div>
+            <div class="translation">全天下都是王室的土地；生活在土地上、靠著物產生存的人，也都是君王的臣民。何況台灣這座島嶼，原本是荒涼蒙昧之地，與內地各省的情況不同。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">自開闢以來，由內地移居此地者，皆屬客民。皆客民也，即皆兄弟也。</div>
+            <div class="translation">自從開發以來，從內地移居到這裡的人，相對於原住民來說都是客民。既然大家都是客民，那就是兄弟。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">今彼分漳、泉，我分閩、粵。即如同一府，彼分此縣，我分彼縣。此即畛域之見，自取滅亡。</div>
+            <div class="translation">現在他們區分漳、泉，我們區分閩、粵。就算在同一府，也要區分這個縣或那個縣。這就是地域的成見，是自取滅亡之道。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">願與二三子共申和睦之誼。視人若己，視他若自，無分爾我。使臺灣一島，變為一家。則和氣充塞，災禍不生。</div>
+            <div class="translation">希望與各位共同申明和睦的情誼。看待別人像看待自己，看待他人如同自家人，不分你我。使台灣一島變成一個大家庭。那麼祥和之氣就會充盈各地，災禍就不會再產生了。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「矧」同為一府</div><div class="back">音ㄕㄣˇ，何況</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「睽隔」</div><div class="back">音ㄎㄨㄟˊ，分離、疏遠</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">分「隸」</div><div class="back">附屬、歸屬</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「同氣」兄弟</div><div class="back">指有血緣關係的兄弟</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「食毛踐土」</div><div class="back">毛：地面生長的物產。指居住在土地上。</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「荒昧」</div><div class="back">荒涼蒙昧（指未開發）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「畛域」之見</div><div class="back">音ㄓㄣˇ，成見、界限</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">自取「滅亡」</div><div class="back">在這裡指因內鬥而導致群體毀滅</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「爾」我</div><div class="back">你（第二人稱）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">和氣「充塞」</div><div class="back">充滿、填滿</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">開臺「黃甲」</div><div class="back">指鄭用錫（台灣第一位進士）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">分類「械鬥」</div><div class="back">清代台灣常見的不同籍貫間的武裝衝突</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>寫作背景與目的</h3>
+        <ul>
+            <li><strong>背景：</strong>清道光、咸豐年間，台灣發生大規模的漳泉械鬥與閩粵械鬥，造成社會極大動盪。</li>
+            <li><strong>目的：</strong>勸誡鄉親放下籍貫成見，停止無謂的流血衝突，追求社會和諧。</li>
+        </ul>
+        <hr>
+        <h3>核心論證邏輯</h3>
+        <ol>
+            <li><strong>天道論：</strong>人盡兄弟，同類相殘有違天道。</li>
+            <li><strong>同質論：</strong>大家都從內地移居而來，本質上都是「客民」，應該互相扶持。</li>
+            <li><strong>地理論：</strong>台灣是一座孤島，大家命運與共，分裂只會導致自取滅亡。</li>
+            <li><strong>博愛論：</strong>無分爾我，視人若己，將「台灣一島變為一家」。</li>
+        </ol>
+        <hr>
+        <h3>文學地位與特色</h3>
+        <ul>
+            <li><strong>情感真摯：</strong>作者身為地方領袖，語氣誠懇且具備「恫瘝在抱」（關懷人民疾苦）的精神。</li>
+            <li><strong>說理透徹：</strong>透過「客民」一詞的詮釋，成功地打破了籍貫的藩籬，是台灣本土文學中極具理性的論說文。</li>
+        </ul>
+    </div>
+</section>
+
+<section id="article-14" class="article-section">
+    <h1>14 鹿港乘桴記</h1>
+    <p class="subtitle">洪繻 —— 鹿港興衰的見證，感嘆滄海桑田與家國變遷的哀歌</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (12)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">重點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">鹿港處臺灣之中，南北交通，其地為要。昔之為鹿港者，其形如鹿，而其港則長而委折，故以為名。</div>
+            <div class="translation">鹿港位於臺灣的中部，是南北交通的要衝。以前的鹿港，地形像鹿，而港灣則長而曲折，所以以此命名。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">當其盛時，舳艫萬里，商賈雲集。由閩、粵而來者，多聚於此。故其地之繁華，冠於全台。</div>
+            <div class="translation">在它最繁榮的時候，船隻往來萬里，商人聚集如雲。從福建、廣東過來的人，大多聚集在這裡。因此當地的繁華程度，堪稱全台灣之冠。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">余自少時，見其港門，巨艦猶能入。今則淤沙日積，港路愈窄。桴之所及，不過數里；而往時舳艫之所到，今則皆為平沙矣。</div>
+            <div class="translation">我少年時，還看見港口能讓巨大的船隻進入。現在則是泥沙一天天淤積，港路越來越窄。現在竹筏能到的地方，不過才幾里遠；而以前大船能到達的地方，現在都已經變成了一片平坦的沙洲。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">夫港之淤，天實為之；然地靈之消長，亦關人事。</div>
+            <div class="translation">港口的淤塞，固然是天意（自然現象）造成的；然而地方靈氣的興衰，也跟人為因素有關。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">余乘桴而遊，仰見青山，俯看流水，覺此中之趣，固非舟車之所能得也。</div>
+            <div class="translation">我坐在竹筏上遊覽，抬頭看青山，低頭看流水，感覺這當中的趣味，實在不是坐船或坐車所能體會到的。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">然往事如煙，繁華已矣。登岸而望，唯見古廟殘碑，落日孤煙。其地之凋零，不覺令人唏噓。</div>
+            <div class="translation">然而往事如煙，繁華已經結束。登上岸遠望，只看見古老的廟宇、殘破的石碑，以及落日與孤煙。當地的凋零景象，讓人不自覺地感到悲傷嘆息。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">夫人生世間，如乘桴於大瀛。去留無定，得失難量。觀鹿港之興替，可以知世事之無常矣。</div>
+            <div class="translation">人生在世，就像乘著竹筏在大海中漂流。去或留無法安定，得或失也難以衡量。觀察鹿港的興衰交替，就可以知道世間的事情是多麼無常了。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「乘桴」</div><div class="back">音ㄈㄨˊ，乘坐竹筏</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">其地為「要」</div><div class="back">要衝、重要的地方</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「委折」</div><div class="back">彎曲轉折</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「舳艫」萬里</div><div class="back">音ㄓㄨˊ ㄌㄨˊ，借代：船隻</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">商「賈」雲集</div><div class="back">音ㄍㄨˇ，商人</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「冠」於全台</div><div class="back">第一名、位居首位</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「淤」沙</div><div class="back">音ㄩ，泥沙堆積阻塞</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「地靈」之消長</div><div class="back">地方的靈氣、運勢</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「唏噓」</div><div class="back">音ㄒㄧ ㄒㄩ，嘆息、悲哀</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">大「瀛」</div><div class="back">音ㄧㄥˊ，大海</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「興替」</div><div class="back">興盛與衰敗</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">作者「洪繻」</div><div class="back">清末民初鹿港著名文人，拒剪辮子。</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>鹿港興衰的對比</h3>
+        
+        <table border="1" style="width:100%; border-collapse: collapse; margin-bottom: 20px;">
+            <tr style="background:#eee;"><th>時期</th><th>景觀特點</th><th>代表詞彙</th></tr>
+            <tr><td><strong>繁榮時期（昔）</strong></td><td>大船入港、貿易發達、全台之冠</td><td>舳艫萬里、商賈雲集</td></tr>
+            <tr><td><strong>凋零時期（今）</strong></td><td>泥沙淤積、港口狹窄、僅通小筏</td><td>淤沙日積、平沙、唏噓</td></tr>
+        </table>
+        <hr>
+        <h3>核心考點：乘桴的隱喻</h3>
+        <ul>
+            <li><strong>典故連結：</strong>「乘桴」語出《論語》：「道不行，乘桴浮於海」。</li>
+            <li><strong>雙層涵義：</strong>表面寫實地在淤塞的港口坐竹筏，深層暗示作者在日治時代「道不行」的無奈與遺民心態。</li>
+        </ul>
+        <hr>
+        <h3>寫作技巧：滄海一粟與無常</h3>
+        <p>作者透過鹿港「天災（淤塞）」與「人禍（人事）」的交織，感嘆世事無常。這種「藉景抒情」的方式，將對家鄉的愛與對時代的痛融合在一起。</p>
+    </div>
+</section>
+
+<section id="article-15" class="article-section">
+    <h1>15 畫菊自序</h1>
+    <p class="subtitle">張李德和 —— 嘉義才女的筆墨情懷，以菊自勵的高雅人格</p>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchInnerTab(this, 0)">逐句譯文</div>
+        <div class="tab" onclick="switchInnerTab(this, 1)">核心閃卡 (12)</div>
+        <div class="tab" onclick="switchInnerTab(this, 2)">重點整理</div>
+    </div>
+
+    <div class="tab-content active">
+        <div class="translation-block">
+            <div class="original">余自幼好弄筆，雖無專師導引，而揮灑之間，頗得自然之趣。暇餘之時，每於窗明几淨之際，研墨試毫，隨興所至，或寫山水，或圖花鳥。</div>
+            <div class="translation">我從小就喜歡拿筆作畫，雖然沒有專門的老師引導，但在揮灑筆墨之間，卻能得到許多自然的樂趣。空閒的時候，每當窗戶明亮、桌子乾淨之際，我會研磨墨汁嘗試動筆，隨著興致所到，有時畫山水，有時畫花鳥。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">然眾花之中，獨好畫菊。蓋以菊有傲霜之骨，而不隨俗榮謝。</div>
+            <div class="translation">然而在眾多花卉之中，我唯獨喜愛畫菊花。大概是因為菊花擁有傲視寒霜的風骨，而且不會隨著世俗的風氣盛開或凋謝。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">觀其在秋風颯颯之中，百卉凋零，而其獨吐芬芳，青翠自若，誠所謂「霜下傑」也。</div>
+            <div class="translation">觀察它在秋風寒涼的季節裡，百花都已凋零，唯獨它吐露芬芳，顏色依然青翠自如，真可以說是「寒霜下的豪傑」啊。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">且其性恬淡，不與爭妍，故為君子之所愛，亦余之所寄也。</div>
+            <div class="translation">而且它的習性恬靜淡泊，不與其他花卉爭奇鬥豔，所以被君子所喜愛，也是我寄託情感的地方。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">夫畫者，心之畫也。寫其形，更當傳其神。余之畫菊，非徒求其外貌之美，實欲效其晚節之堅。</div>
+            <div class="translation">繪畫這件事，其實是內心的映照。描摹它的外形，更應當傳達它的神韻。我畫菊花，不只是追求外在的美感，實際上是想要效法它那堅貞的晚節（晚年的節操）。</div>
+        </div>
+
+        <div class="translation-block">
+            <div class="original">每當潑墨之頃，自覺神清氣爽，胸中點塵不染，此畫菊之功，亦即修身之道也。</div>
+            <div class="translation">每當動筆作畫的時刻，自覺神采清朗、意氣爽快，胸中一點塵世的雜念都沒有。這畫菊的功效，其實也就是修養品德的方法啊。</div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <div class="flashcard-grid">
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「弄筆」</div><div class="back">指繪畫或寫作</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「窗明几淨」</div><div class="back">几音ㄐㄧ，桌子。形容環境整潔明亮。</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「傲霜」之骨</div><div class="back">形容不畏嚴寒、不屈不撓的精神</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「榮謝」</div><div class="back">花開與花落，引申為興衰。</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">秋風「颯颯」</div><div class="back">音ㄙㄚˋ，形容風聲</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「百卉」凋零</div><div class="back">音ㄏㄨㄟˋ，草本植物的總稱（各種花草）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「霜下傑」</div><div class="back">指菊花（能在寒霜中盛開的傑出者）</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">性「恬淡」</div><div class="back">音ㄊㄧㄢˊ，恬靜淡泊、不慕名利</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">不與「爭妍」</div><div class="back">音ㄧㄢˊ，爭奇鬥豔</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「晚節」</div><div class="back">指晚年的節操</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">「點塵不染」</div><div class="back">形容非常乾淨，也指思想純潔。</div></div></div>
+            <div class="flashcard" onclick="flipCard(this)"><div class="flashcard-inner"><div class="front">作者背景</div><div class="back">嘉義人，號琳瑯山閣主人，擅長詩書畫。</div></div></div>
+        </div>
+    </div>
+
+    <div class="tab-content">
+        <h3>繪畫與人格的連結</h3>
+        
+        <ul>
+            <li><strong>物我合一：</strong>作者不只是在「畫」菊，更是在「學」菊。將菊花的生物特性轉化為儒家的人格修養。</li>
+            <li><strong>藝術的功能：</strong>繪畫不只是消遣，更是「修身之道」，可以讓人神清氣爽、點塵不染。</li>
+        </ul>
+        <hr>
+        <h3>菊花的象徵意義（國學常識補充）</h3>
+        <ul>
+            <li><strong>隱逸之友：</strong>自陶淵明後，菊花成為「隱逸者」的象徵。</li>
+            <li><strong>四君子：</strong>梅、蘭、竹、菊。菊花代表「秋」與「高潔」。</li>
+            <li><strong>本課重點：</strong>文中特別強調「傲霜」與「晚節」，這在大考常與「處世原則」相關題材結合。</li>
+        </ul>
+        <hr>
+        <h3>作者地位與文學風格</h3>
+        <p>張李德和是日治時期「嘉義琳瑯山閣」的女主人。她的文字清麗、情感真摯。作為十五古文中唯一的女性視角，本文展現了女性在家庭生活之餘，對精神世界的追求與自律。</p>
+    </div>
+</section>
+
+
+        </div>
+</main>
+
+
+<script>
+    // 1. 切換課文邏輯
+    function changeArticle(id) {
+        // 更新導覽列樣式
+        const navItems = document.querySelectorAll('nav li');
+        navItems.forEach((li, index) => {
+            li.classList.toggle('active', index === (id - 1));
+        });
+
+        // 隱藏所有課文，顯示目標課文
+        const sections = document.querySelectorAll('.article-section');
+        sections.forEach(sec => sec.classList.remove('active'));
+        
+        const target = document.getElementById('article-' + id);
+        if (target) {
+            target.classList.add('active');
+            // 切換時自動回到最上方
+            document.querySelector('main').scrollTop = 0;
+        } else {
+            alert("該課內容準備中！");
+        }
+    }
+
+    // 2. 切換課內分頁邏輯 (Tab 切換)
+    function switchInnerTab(tabBtn, index) {
+        const parentSection = tabBtn.closest('.article-section');
+        
+        // 移除該區塊內所有 Tab 的 active 樣式
+        parentSection.querySelectorAll('.tab').forEach((t, i) => {
+            t.classList.toggle('active', i === index);
+        });
+        
+        // 隱藏該區塊內所有內容，顯示對應索引內容
+        parentSection.querySelectorAll('.tab-content').forEach((c, i) => {
+            c.classList.toggle('active', i === index);
+        });
+    }
+
+    // 3. 閃卡翻轉邏輯
+    function flipCard(card) {
+        card.classList.toggle('flipped');
+    }
+</script>
+
+</body>
+</html>
